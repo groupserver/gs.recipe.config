@@ -31,11 +31,11 @@ class ConfigCreator(object):
         if self.database == {}:
             retval = ''
         else:
-            d = self.databse
+            d = self.database
             if d['username'] and d['password']:
                 d['password'] = ':%s@' % self.database['password']
             elif d['username'] and not d['password']:
-                d['username'] = '%s@' % self.databse['username']
+                d['username'] = '%s@' % self.database['username']
             retval = 'dsn://{username}{password}{host}:{port}/{name}'.format(d)
         return retval
 
