@@ -36,7 +36,8 @@ class ConfigCreator(object):
                 d['password'] = ':%s@' % self.database['password']
             elif d['username'] and not d['password']:
                 d['username'] = '%s@' % self.database['username']
-            retval = 'dsn://{username}{password}{host}:{port}/{name}'.format(d)
+            s = 'postgres://{username}{password}{host}:{port}/{name}'
+            retval = s.format(**d)
         return retval
 
     @property
@@ -55,7 +56,7 @@ class ConfigCreator(object):
     def smtpBlock(self):
         retval = '[smtp-on]\nqueuepath = /tmp/groupserver-default-mail-queue'\
                     'xverp = True\nhostname = {host}\n'\
-                    'port = {port}'.format(self.smtp)
+                    'port = {port}'.format(**self.smtp)
         if self.smtp['user']:
             retval = '{}\nuser = {}'.format(retval, self.smtp['user'])
         if self.smtp['password']:
