@@ -48,7 +48,7 @@ class ConfigCreator(object):
     def set_smtp(self, host, port, user, password):
         self.smtp['host'] = host.strip()
         self.smtp['port'] = port.strip()
-        self.stmp['user'] = user.strip()
+        self.smtp['user'] = user.strip()
         self.smtp['password'] = password.strip()
 
     @property
