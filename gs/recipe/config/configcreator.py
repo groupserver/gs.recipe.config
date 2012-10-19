@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import os.path
 from sqlalchemy import create_engine, MetaData, Table
-from App.config import getConfiguration
 from gs.auth.token.createtoken import create_token, delete_old_tokens_from_db,\
     add_token_to_db
 
@@ -58,7 +56,7 @@ class ConfigCreator(object):
     @property
     def smtpBlock(self):
         retval = '[smtp-on]\nqueuepath = /tmp/groupserver-default-mail-queue'\
-                    'xverp = True\nhostname = {host}\n'\
+                    '\nxverp = True\nhostname = {host}\n'\
                     'port = {port}'.format(**self.smtp)
         if self.smtp['user']:
             retval = '{}\nuser = {}'.format(retval, self.smtp['user'])
@@ -96,14 +94,12 @@ class ConfigCreator(object):
         retval = '[webservice-default]\ntoken = {}'.format(self.token)
         return retval
 
-    def write(self):
-        cfg = getConfiguration()
-        outFileName = os.path.join(cfg.instancehome, 'etc/gsconfig.ini')
-
-        outtext = '{}\n{}\n{}\n{}\n{}'.format(self.databaseBlock,
-            self.smtpBlock, self.smtpOffBlock, self.cacheBlock,
-            self.webserviceBlock)
-
-        with file(outFileName, 'w') as outfile:
-            outfile.write(outtext)
+    def write(self, dest):
+        with file(dest, 'w') as outfile:
+            outfile.write(self.configBlock+'\n\n')
+            outfile.write(self.databaseBlock+'\n\n')
+            outfile.write(self.smtpBlock+'\n\n')
+            outfile.write(self.smtpOffBlock+'\n\n')
+            outfile.write(self.cacheBlock+'\n\n')
+            outfile.write(self.webserviceBlock+'\n\n')
         self.write_token()

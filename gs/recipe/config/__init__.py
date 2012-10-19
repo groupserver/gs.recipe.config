@@ -51,7 +51,7 @@ want to run it again set the run-once option to false or delete
                                         self.options['smtp_user'],
                                         self.options['smtp_password'])
                 configCreator.create_token()
-                configCreator.write()
+                configCreator.write(self.options['dest'])
             except Exception, e:
                 m = '%s Issue creating the configuration\n%s\n\n' %\
                     (self.name, e)
@@ -59,7 +59,8 @@ want to run it again set the run-once option to false or delete
                 sys.exit(1)
             else:
                 self.mark_locked()
-                sys.stdout.write('\nConfiguration written\n\n')
+                m = 'Configuration written to\n{dest}\n\n'
+                sys.stdout.write(m.format(**self.options))
         return tuple()
 
     def update(self):
