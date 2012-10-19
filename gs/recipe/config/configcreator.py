@@ -6,7 +6,7 @@ from gs.auth.token.createtoken import create_token, delete_old_tokens_from_db,\
     add_token_to_db
 
 
-class CreateConfig(object):
+class ConfigCreator(object):
 
     def __init__(self):
         self.databse = {}
