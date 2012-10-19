@@ -19,9 +19,9 @@ long_description = (
 entry_point = 'gs.recipe.createtables:Recipe'
 entry_points = {"zc.buildout": ["default = %s" % entry_point]}
 
-setup(name='gs.recipe.createtables',
+setup(name='gs.recipe.config',
       version=version,
-      description="Setup GroupServer instance in Zope",
+      description="Setup the GroupServer configuration",
       long_description=long_description,
       classifiers=[
         'Framework :: Buildout',
@@ -35,7 +35,7 @@ setup(name='gs.recipe.createtables',
         "Operating System :: POSIX :: Linux"
         "Programming Language :: Python",
         ],
-      keywords='zope groupserver recipe setup instance database',
+      keywords='zope groupserver recipe setup instance database config ini',
       author='Michael JasonSmith',
       author_email='mpj17@onlinegroups.net',
       url='',
@@ -46,19 +46,9 @@ setup(name='gs.recipe.createtables',
       zip_safe=True,
       install_requires=[
         'setuptools',
+        'sqlalchemy',
         'zc.buildout',
-        'gs.group.member.invite.base',
-        'gs.group.member.request',
-        'gs.group.messages.post',
-        'gs.group.messages.topic',
-        'gs.option',
-        'gs.profile.email.base',
-        'gs.profile.email.verify',
-        'gs.profile.password',
-        'Products.CustomUserFolder',
-        'Products.GroupServer',
-        'Products.GSAuditTrail',
-        'Products.GSGroupMember',
-        'Products.XWFMailingListManager', ],
+        'Zope2',
+        'gs.auth.token'],
       entry_points=entry_points,
       )
