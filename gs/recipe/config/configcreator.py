@@ -12,6 +12,7 @@ class ConfigCreator(object):
         self.database = {}
         self.smtp = {}
         self.token = None
+        self.__dsn = None
 
     @property
     def configBlock(self):
@@ -25,20 +26,22 @@ class ConfigCreator(object):
         self.database['host'] = host.strip()
         self.database['port'] = port.strip()
         self.database['name'] = name.strip()
+        self.__dsn = None
 
     @property
     def dsn(self):
-        if self.database == {}:
-            retval = ''
-        else:
-            d = self.database
-            if d['username'] and d['password']:
-                d['password'] = ':%s@' % self.database['password']
-            elif d['username'] and not d['password']:
-                d['username'] = '%s@' % self.database['username']
-            s = 'postgres://{username}{password}{host}:{port}/{name}'
-            retval = s.format(**d)
-        return retval
+        if self.__dsn is None:
+            if self.database == {}:
+                self.__dsn = ''
+            else:
+                d = self.database
+                if d['username'] and d['password']:
+                    d['password'] = ':%s@' % self.database['password']
+                elif d['username'] and not d['password']:
+                    d['username'] = '%s@' % self.database['username']
+                s = 'postgres://{username}{password}{host}:{port}/{name}'
+                self.__dsn = s.format(**d)
+        return self.__dsn
 
     @property
     def databaseBlock(self):
