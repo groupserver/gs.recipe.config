@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-This module contains the tool of gs.recipe.createtables
-"""
 import os
 from setuptools import setup, find_packages
 from version import get_version
@@ -16,7 +13,7 @@ long_description = (
     file(os.path.join('docs', 'CHANGES.txt')).read()
     + '\n'
     )
-entry_point = 'gs.recipe.createtables:Recipe'
+entry_point = 'gs.recipe.config:Recipe'
 entry_points = {"zc.buildout": ["default = %s" % entry_point]}
 
 setup(name='gs.recipe.config',
