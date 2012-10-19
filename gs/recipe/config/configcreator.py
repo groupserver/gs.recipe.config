@@ -9,7 +9,7 @@ from gs.auth.token.createtoken import create_token, delete_old_tokens_from_db,\
 class ConfigCreator(object):
 
     def __init__(self):
-        self.databse = {}
+        self.database = {}
         self.smtp = {}
         self.token = None
 
