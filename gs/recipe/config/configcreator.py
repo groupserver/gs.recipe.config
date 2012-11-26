@@ -43,7 +43,7 @@ class ConfigCreator(object):
 
     @property
     def databaseBlock(self):
-        retval = '[database-default]\ndsn = {}'.format(self.dsn)
+        retval = '[database-default]\ndsn = {0}'.format(self.dsn)
         assert type(retval) == str
         return retval
 
@@ -59,9 +59,10 @@ class ConfigCreator(object):
                     '\nxverp = True\nhostname = {host}\n'\
                     'port = {port}'.format(**self.smtp)
         if self.smtp['user']:
-            retval = '{}\nuser = {}'.format(retval, self.smtp['user'])
+            retval = '{0}\nuser = {1}'.format(retval, self.smtp['user'])
         if self.smtp['password']:
-            retval = '{}\npassword = {}'.format(retval, self.smtp['password'])
+            retval = '{0}\npassword = {1}'.format(retval,
+                                                    self.smtp['password'])
         assert type(retval) == str
         return retval
 
@@ -91,15 +92,15 @@ class ConfigCreator(object):
 
     @property
     def webserviceBlock(self):
-        retval = '[webservice-default]\ntoken = {}'.format(self.token)
+        retval = '[webservice-default]\ntoken = {0}'.format(self.token)
         return retval
 
     def write(self, dest):
         with file(dest, 'w') as outfile:
-            outfile.write(self.configBlock+'\n\n')
-            outfile.write(self.databaseBlock+'\n\n')
-            outfile.write(self.smtpBlock+'\n\n')
-            outfile.write(self.smtpOffBlock+'\n\n')
-            outfile.write(self.cacheBlock+'\n\n')
-            outfile.write(self.webserviceBlock+'\n\n')
+            outfile.write(self.configBlock + '\n\n')
+            outfile.write(self.databaseBlock + '\n\n')
+            outfile.write(self.smtpBlock + '\n\n')
+            outfile.write(self.smtpOffBlock + '\n\n')
+            outfile.write(self.cacheBlock + '\n\n')
+            outfile.write(self.webserviceBlock + '\n\n')
         self.write_token()
