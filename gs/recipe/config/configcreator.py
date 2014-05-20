@@ -1,22 +1,54 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import create_engine, MetaData, Table
-from gs.auth.token.createtoken import create_token, delete_old_tokens_from_db,\
-    add_token_to_db
+##############################################################################
+#
+# Copyright © 2012, 2014 OnlineGroups.net and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+from __future__ import absolute_import, unicode_literals
+import codecs
+from sqlalchemy import (create_engine, MetaData, Table)
+from zope.cachedescriptors.property import Lazy
+from gs.auth.token.createtoken import (create_token, delete_old_tokens_from_db,
+                                        add_token_to_db)
+UTF8 = 'utf-8'
 
 
 class ConfigCreator(object):
+
+    # TODO: SMTP off by default?
+    configBlock = '''[config-default]
+database = default
+smtp = on
+cache = on
+webservice = default'''
+
+    smtpOffBlock = '''[smtp-off]
+hostname = localhost
+port = 25
+queuepath = /tmp/test-mail-queue
+processorthread = False'''
+
+    cacheBlock = '''[cache-on]
+backend = redis
+hostname = localhost
+port = 6379
+
+[cache-off]
+backend = none
+'''
 
     def __init__(self):
         self.database = {}
         self.smtp = {}
         self.token = None
-        self.__dsn = None
-
-    @property
-    def configBlock(self):
-        retval = '[config-default]\ndatabase = default\nsmtp = on\ncache = on'\
-                    '\nwebservice = default'
-        return retval
 
     def set_database(self, username, password, host, port, name):
         self.database['username'] = username.strip()
@@ -24,27 +56,25 @@ class ConfigCreator(object):
         self.database['host'] = host.strip()
         self.database['port'] = port.strip()
         self.database['name'] = name.strip()
-        self.__dsn = None
+        del(self.dsn)
 
-    @property
+    @Lazy
     def dsn(self):
-        if self.__dsn is None:
-            if self.database == {}:
-                self.__dsn = ''
-            else:
-                d = self.database
-                if d['username'] and d['password']:
-                    d['password'] = ':%s@' % self.database['password']
-                elif d['username'] and not d['password']:
-                    d['username'] = '%s@' % self.database['username']
-                s = 'postgres://{username}{password}{host}:{port}/{name}'
-                self.__dsn = s.format(**d)
-        return self.__dsn
+        if self.database == {}:
+            retval = ''
+        else:
+            d = self.database
+            if d['username'] and d['password']:
+                d['password'] = ':%s@' % self.database['password']
+            elif d['username'] and not d['password']:
+                d['username'] = '%s@' % self.database['username']
+            s = 'postgres://{username}{password}{host}:{port}/{name}'
+            retval = s.format(**d)
+        return retval
 
     @property
     def databaseBlock(self):
         retval = '[database-default]\ndsn = {0}'.format(self.dsn)
-        assert type(retval) == str
         return retval
 
     def set_smtp(self, host, port, user, password):
@@ -55,27 +85,18 @@ class ConfigCreator(object):
 
     @property
     def smtpBlock(self):
-        retval = '[smtp-on]\nqueuepath = /tmp/groupserver-default-mail-queue'\
-                    '\nxverp = True\nhostname = {host}\n'\
-                    'port = {port}'.format(**self.smtp)
+        r = '''[smtp-on]
+queuepath = /tmp/groupserver-default-mail-queue
+xverp = True
+hostname = {host}
+port = {port}'''
+        retval = r.format(**self.smtp)
         if self.smtp['user']:
             retval = '{0}\nuser = {1}'.format(retval, self.smtp['user'])
         if self.smtp['password']:
             retval = '{0}\npassword = {1}'.format(retval,
                                                     self.smtp['password'])
         assert type(retval) == str
-        return retval
-
-    @property
-    def smtpOffBlock(self):
-        retval = '[smtp-off]\nhostname = localhost\nport = 25\n'\
-                'queuepath = /tmp/test-mail-queue\nprocessorthread = False'
-        return retval
-
-    @property
-    def cacheBlock(self):
-        retval = '[cache-on]\nbackend = redis\nhostname = localhost\n'\
-                'port = 6379\n\n[cache-off]\nbackend = none\n'
         return retval
 
     def create_token(self):
@@ -96,11 +117,9 @@ class ConfigCreator(object):
         return retval
 
     def write(self, dest):
-        with file(dest, 'w') as outfile:
-            outfile.write(self.configBlock + '\n\n')
-            outfile.write(self.databaseBlock + '\n\n')
-            outfile.write(self.smtpBlock + '\n\n')
-            outfile.write(self.smtpOffBlock + '\n\n')
-            outfile.write(self.cacheBlock + '\n\n')
-            outfile.write(self.webserviceBlock + '\n\n')
+        m = self.configBlock + '\n\n' + self.databaseBlock + '\n\n' + \
+            self.smtpBlock + '\n\n' + self.smtpOffBlock + '\n\n' + \
+            self.cacheBlock + '\n\n' + self.webserviceBlock + '\n\n'
+        with codecs.open(dest, 'w', UTF8) as outfile:
+            outfile.write(m)
         self.write_token()
