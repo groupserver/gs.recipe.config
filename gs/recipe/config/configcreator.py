@@ -22,6 +22,7 @@ UTF8 = 'utf-8'
 
 
 class ConfigCreator(object):
+    'Create the configuration file for GroupServer'
 
     # TODO: SMTP off by default?
     configBlock = '''[config-default]
@@ -56,7 +57,20 @@ backend = none
         self.database['host'] = host.strip()
         self.database['port'] = port.strip()
         self.database['name'] = name.strip()
-        del(self.dsn)
+        try:
+            del self.dsn
+        except AttributeError:
+            pass
+
+        if not self.database['host']:
+            m = '"host" is required'
+            raise TypeError(m)
+        if not self.database['port']:
+            m = '"port" is required'
+            raise TypeError(m)
+        if not self.database['name']:
+            m = '"name" is required'
+            raise TypeError(m)
 
     @Lazy
     def dsn(self):
@@ -65,9 +79,11 @@ backend = none
         else:
             d = self.database
             if d['username'] and d['password']:
-                d['password'] = ':%s@' % self.database['password']
+                d['password'] = ':{0}@'.format(self.database['password'])
             elif d['username'] and not d['password']:
-                d['username'] = '%s@' % self.database['username']
+                d['username'] = '{0}@'.format(self.database['username'])
+            elif d['password'] and not d['username']:
+                d['password'] = ''
             s = 'postgres://{username}{password}{host}:{port}/{name}'
             retval = s.format(**d)
         return retval
@@ -96,7 +112,6 @@ port = {port}'''
         if self.smtp['password']:
             retval = '{0}\npassword = {1}'.format(retval,
                                                     self.smtp['password'])
-        assert type(retval) == str
         return retval
 
     def create_token(self):
