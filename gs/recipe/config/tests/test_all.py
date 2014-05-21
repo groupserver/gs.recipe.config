@@ -14,11 +14,11 @@
 ##############################################################################
 from __future__ import absolute_import, unicode_literals
 from unittest import TestSuite, main as unittest_main
-#from gs.recipe.config.tests.configcreator import TestCreatorDB
-#(TestCreatorDB,
-#    TestCreatorSMTP, )
+from gs.recipe.config.tests.configcreator import (TestCreatorDB,
+    TestCreatorSMTP, TestCreatorWebservice)
 from gs.recipe.config.tests.recipe import TestRecipe
-testCases = (TestRecipe, )
+testCases = (TestCreatorDB, TestCreatorSMTP, TestCreatorWebservice,
+                TestRecipe, )
 
 
 def load_tests(loader, tests, pattern):

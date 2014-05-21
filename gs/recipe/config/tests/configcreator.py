@@ -71,34 +71,34 @@ class TestCreatorDB(TestCase):
         self.assertIn('dsn = postgres://host:port/name', cc.databaseBlock)
 
 
-#class TestCreatorSMTP(TestCase):
-    #'Test the SMTP block'
+class TestCreatorSMTP(TestCase):
+    'Test the SMTP block'
 
-    #def setUp(self):
-        #gs.recipe.config.configcreator.create_token = MagicMock()
-        #gs.recipe.config.configcreator.delete_old_tokens_from_db = MagicMock()
-        #gs.recipe.config.configcreator.add_token_to_db = MagicMock()
+    def setUp(self):
+        gs.recipe.config.configcreator.create_token = MagicMock()
+        gs.recipe.config.configcreator.delete_old_tokens_from_db = MagicMock()
+        gs.recipe.config.configcreator.add_token_to_db = MagicMock()
 
-    #def test_smtp_host(self):
-        #cc = gs.recipe.config.configcreator.ConfigCreator()
-        #cc.set_smtp('host', 'port', 'user', 'password')
-        #self.assertIn('hostname = host', cc.smtpBlock)
+    def test_smtp_host(self):
+        cc = gs.recipe.config.configcreator.ConfigCreator()
+        cc.set_smtp('host', 'port', 'user', 'password')
+        self.assertIn('hostname = host', cc.smtpBlock)
 
-    #def test_smtp_port(self):
-        #cc = gs.recipe.config.configcreator.ConfigCreator()
-        #cc.set_smtp('host', 'port', 'user', 'password')
-        #self.assertIn('port = port', cc.smtpBlock)
+    def test_smtp_port(self):
+        cc = gs.recipe.config.configcreator.ConfigCreator()
+        cc.set_smtp('host', 'port', 'user', 'password')
+        self.assertIn('port = port', cc.smtpBlock)
 
 
-#class TestCreatorWebservice(TestCase):
-    #'Test the Webserfice block'
+class TestCreatorWebservice(TestCase):
+    'Test the Webserfice block'
 
-    #def setUp(self):
-        #gs.recipe.config.configcreator.create_token = MagicMock()
-        #gs.recipe.config.configcreator.delete_old_tokens_from_db = MagicMock()
-        #gs.recipe.config.configcreator.add_token_to_db = MagicMock()
+    def setUp(self):
+        gs.recipe.config.configcreator.create_token = MagicMock()
+        gs.recipe.config.configcreator.delete_old_tokens_from_db = MagicMock()
+        gs.recipe.config.configcreator.add_token_to_db = MagicMock()
 
-    #def test_smtp_host(self):
-        #cc = gs.recipe.config.configcreator.ConfigCreator()
-        #cc.token = 'foo'
-        #self.assertIn('token = ', cc.webserviceBlock)
+    def test_smtp_host(self):
+        cc = gs.recipe.config.configcreator.ConfigCreator()
+        cc.token = 'foo'
+        self.assertIn('token = ', cc.webserviceBlock)
