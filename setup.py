@@ -62,6 +62,7 @@ setup(name='gs.recipe.config',
       install_requires=[
         'setuptools',
         'sqlalchemy',
+        'psycopg2',
         'zc.buildout',
         'zope.cachedescriptors',
         'gs.auth.token',
