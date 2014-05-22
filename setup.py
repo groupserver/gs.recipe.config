@@ -63,7 +63,10 @@ setup(name='gs.recipe.config',
         'setuptools',
         'sqlalchemy',
         'zc.buildout',
+        'zope.cachedescriptors',
         'gs.auth.token',
         'gs.recipe.base', ],
       entry_points=entry_points,
-      )
+      test_suite='gs.recipe.config.tests.test_all',
+      tests_require=['mock', ],
+)
