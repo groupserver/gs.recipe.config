@@ -13,12 +13,13 @@
 #
 ##############################################################################
 from __future__ import absolute_import, unicode_literals
-from mock import MagicMock
+import codecs
+from mock import MagicMock, patch
 import os
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
-# from zc.buildout import UserError
+from zc.buildout import UserError
 import gs.recipe.config.recipe
 UTF8 = 'utf-8'
 
@@ -29,6 +30,8 @@ class TestRecipe(TestCase):
         self.tempdir = mkdtemp()
         self.bindir = os.path.join(self.tempdir, 'bin')
         os.mkdir(self.bindir)
+        etcdir = os.path.join(self.tempdir, 'etc')
+        os.mkdir(etcdir)
         vardir = os.path.join(self.tempdir, 'var')
         os.mkdir(vardir)
 
@@ -46,12 +49,55 @@ class TestRecipe(TestCase):
         self.options['smtp_port'] = '2525'
         self.options['smtp_user'] = ''
         self.options['smtp_password'] = ''
+        self.destPath = os.path.join(etcdir, 'gsconfig.ini')
+        self.options['dest'] = self.destPath
 
-        self.recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout,
-                                                    self.name, self.options)
+        gs.recipe.config.recipe.ConfigCreator.write_token = \
+            MagicMock(return_value='fake-token')
 
         gs.recipe.config.recipe.sys.stdout = MagicMock()
         gs.recipe.config.recipe.sys.stderr = MagicMock()
 
     def tearDown(self):
         rmtree(self.tempdir)
+        self.tempdir = self.bindir = self.destPath = None
+
+    def test_install_standard(self):
+        'Test a normal run of the installer'
+        recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout, self.name,
+                                                        self.options)
+        r = recipe.should_run()
+        self.assertTrue(r)
+
+        recipe.install()
+
+        r = recipe.should_run()
+        self.assertFalse(r)
+
+        self.assertTrue(os.path.exists(self.tempdir))
+        msg = '{0} is not a regular file.'.format(self.destPath)
+        self.assertTrue(os.path.exists(self.destPath), msg=msg)
+        with codecs.open(self.destPath, 'r', UTF8) as infile:
+            d = infile.read()
+
+        inFile = [k for k in self.options
+                    if (('smtp' in k) or ('database' in k))]
+        for k in inFile:
+            val = self.options[k]
+            if val:
+                self.assertIn(val, d)
+
+    def test_install_os_error(self):
+        'Test a run of the installer that hits an OS error'
+        cc = gs.recipe.config.recipe.ConfigCreator
+        with patch.object(cc, 'write', autospec=True) as mock_write:
+            mock_write.side_effect = OSError
+
+            recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout,
+                                                    self.name, self.options)
+            r = recipe.should_run()
+            self.assertTrue(r)
+            self.assertRaises(UserError, recipe.install)
+
+            r = recipe.should_run()
+            self.assertTrue(r)  # Should not be locked after the raise
