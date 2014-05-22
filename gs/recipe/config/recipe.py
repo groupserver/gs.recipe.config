@@ -41,7 +41,7 @@ class ConfigRecipe(Recipe):
             except OSError as e:
                 m = '{0} Issue creating the configuration\n{1}\n\n'
                 msg = m.format(self.name, e)
-                UserError(msg)
+                raise UserError(msg)
             else:
                 self.mark_locked()
                 m = 'Configuration written to\n{dest}\n\n'
