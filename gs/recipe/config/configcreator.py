@@ -96,8 +96,8 @@ backend = none
     def set_smtp(self, host, port, user, password):
         self.smtp['host'] = host.strip()
         self.smtp['port'] = port.strip()
-        self.smtp['user'] = user.strip()
-        self.smtp['password'] = password.strip()
+        self.smtp['user'] = user.strip() if user else ''
+        self.smtp['password'] = password.strip() if password else ''
 
     @property
     def smtpBlock(self):

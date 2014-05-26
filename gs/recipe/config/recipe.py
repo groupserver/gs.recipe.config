@@ -27,20 +27,26 @@ class ConfigRecipe(Recipe):
         if self.should_run():
             configCreator = ConfigCreator()
             try:
-                configCreator.set_database(self.options['database_username'],
-                                            self.options['database_password'],
-                                            self.options['database_host'],
-                                            self.options['database_port'],
-                                            self.options['database_name'])
+                configCreator.set_database(
+                    self.options.get('database_username', ''),
+                    self.options.get('database_password', ''),
+                    self.options['database_host'],
+                    self.options['database_port'],
+                    self.options['database_name'])
                 configCreator.set_smtp(self.options['smtp_host'],
                                         self.options['smtp_port'],
-                                        self.options['smtp_user'],
-                                        self.options['smtp_password'])
+                                        self.options.get('smtp_user' ''),
+                                        self.options.get('smtp_password', ''))
                 configCreator.create_token()
                 configCreator.write(self.options['dest'])
             except OSError as e:
                 m = '{0} Issue creating the configuration\n{1}\n\n'
                 msg = m.format(self.name, e)
+                raise UserError(msg)
+            except KeyError as e:
+                m = '{0} Issue creating the configuration\nThe required '\
+                    'paramater "{1}" was not supplied.'
+                msg = m.format(self.name, e.args[0])
                 raise UserError(msg)
             else:
                 self.mark_locked()

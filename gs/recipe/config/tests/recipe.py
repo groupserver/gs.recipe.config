@@ -62,17 +62,24 @@ class TestRecipe(TestCase):
         rmtree(self.tempdir)
         self.tempdir = self.bindir = self.destPath = None
 
+    def assert_should_run_true(self, recipe):
+        msg = 'Recipe should run, but ConfigRecipe.should_run returned False.'
+        r = recipe.should_run()
+        self.assertTrue(r, msg)
+
+    def assert_should_run_false(self, recipe):
+        msg = 'Recipe should be locked, but ConfigRecipe.should_run returned '\
+                'True.'
+        r = recipe.should_run()
+        self.assertFalse(r, msg)
+
     def test_install_standard(self):
         'Test a normal run of the installer'
         recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout, self.name,
                                                         self.options)
-        r = recipe.should_run()
-        self.assertTrue(r)
-
+        self.assert_should_run_true(recipe)
         recipe.install()
-
-        r = recipe.should_run()
-        self.assertFalse(r)
+        self.assert_should_run_false(recipe)
 
         self.assertTrue(os.path.exists(self.tempdir))
         msg = '{0} is not a regular file.'.format(self.destPath)
@@ -95,9 +102,37 @@ class TestRecipe(TestCase):
 
             recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout,
                                                     self.name, self.options)
-            r = recipe.should_run()
-            self.assertTrue(r)
+            self.assert_should_run_true(recipe)
             self.assertRaises(UserError, recipe.install)
+            # Should not be locked after the raise
+            self.assert_should_run_true(recipe)
 
-            r = recipe.should_run()
-            self.assertTrue(r)  # Should not be locked after the raise
+    def test_install_option(self):
+        'Ensure that the optional parameters are infact optional'
+        options = ['database_username', 'database_password', 'smtp_user',
+                    'smtp_password', ]
+        for option in options:
+            del self.options[option]
+            recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout,
+                                                self.name, self.options)
+            self.assert_should_run_true(recipe)
+            recipe.install()
+            self.assert_should_run_false(recipe)
+            self.tearDown()
+            self.setUp()
+
+    def test_install_option_error(self):
+        'Test what happens if a required parameter is omitted'
+        requiredOptions = ['database_host', 'database_port', 'database_name',
+                            'smtp_host', 'smtp_port']
+        for option in requiredOptions:
+            o = self.options[option]
+            del self.options[option]
+            recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout,
+                                                self.name, self.options)
+            self.assert_should_run_true(recipe)
+            self.assertRaises(UserError, recipe.install)
+            # Should not be locked after the raise
+            self.assert_should_run_true(recipe)
+
+            self.options[option] = o
