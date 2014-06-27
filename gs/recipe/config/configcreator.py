@@ -108,7 +108,7 @@ hostname = {host}
 port = {port}'''
         retval = r.format(**self.smtp)
         if self.smtp['user']:
-            retval = '{0}\nuser = {1}'.format(retval, self.smtp['user'])
+            retval = '{0}\nusername = {1}'.format(retval, self.smtp['user'])
         if self.smtp['password']:
             retval = '{0}\npassword = {1}'.format(retval,
                                                     self.smtp['password'])
