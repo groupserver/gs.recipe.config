@@ -81,13 +81,37 @@ class TestCreatorSMTP(TestCase):
 
     def test_smtp_host(self):
         cc = gs.recipe.config.configcreator.ConfigCreator()
-        cc.set_smtp('host', 'port', 'user', 'password')
-        self.assertIn('hostname = host', cc.smtpBlock)
+        cc.set_smtp('smtp.example.com', '2525', 'me', 'Passw0rd')
+        self.assertIn('hostname = smtp.example.com', cc.smtpBlock)
 
     def test_smtp_port(self):
         cc = gs.recipe.config.configcreator.ConfigCreator()
-        cc.set_smtp('host', 'port', 'user', 'password')
-        self.assertIn('port = port', cc.smtpBlock)
+        cc.set_smtp('smtp.example.com', '2525', 'me', 'Passw0rd')
+        self.assertIn('port = 2525', cc.smtpBlock)
+
+    def test_smtp_user_set(self):
+        'Test the config when the username is set'
+        cc = gs.recipe.config.configcreator.ConfigCreator()
+        cc.set_smtp('smtp.example.com', '2525', 'me', 'Passw0rd')
+        self.assertIn('username = me', cc.smtpBlock)
+
+    def test_smtp_user_missing(self):
+        'Test the config when the username is missing'
+        cc = gs.recipe.config.configcreator.ConfigCreator()
+        cc.set_smtp('smtp.example.com', '2525', '', '')
+        self.assertNotIn('username', cc.smtpBlock)
+
+    def test_smtp_password_set(self):
+        'Test the config when the password is set'
+        cc = gs.recipe.config.configcreator.ConfigCreator()
+        cc.set_smtp('smtp.example.com', '2525', 'me', 'Passw0rd')
+        self.assertIn('password = Passw0rd', cc.smtpBlock)
+
+    def test_smtp_password_missing(self):
+        'Test the config when the password is missing'
+        cc = gs.recipe.config.configcreator.ConfigCreator()
+        cc.set_smtp('smtp.example.com', '2525', 'me', '')
+        self.assertNotIn('password', cc.smtpBlock)
 
 
 class TestCreatorWebservice(TestCase):
