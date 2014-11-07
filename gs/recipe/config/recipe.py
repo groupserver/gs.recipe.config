@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+############################################################################
 #
 # Copyright © 2012, 2014 OnlineGroups.net and Contributors.
 # All Rights Reserved.
@@ -11,7 +11,7 @@
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-##############################################################################
+############################################################################
 from __future__ import absolute_import, unicode_literals
 import sys
 from zc.buildout import UserError
@@ -34,9 +34,9 @@ class ConfigRecipe(Recipe):
                     self.options['database_port'],
                     self.options['database_name'])
                 configCreator.set_smtp(self.options['smtp_host'],
-                                        self.options['smtp_port'],
-                                        self.options.get('smtp_user' ''),
-                                        self.options.get('smtp_password', ''))
+                                       self.options['smtp_port'],
+                                       self.options.get('smtp_user' ''),
+                                       self.options.get('smtp_password', ''))
                 configCreator.create_token()
                 configCreator.write(self.options['dest'])
             except OSError as e:

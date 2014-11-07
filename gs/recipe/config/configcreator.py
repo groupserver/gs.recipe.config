@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+############################################################################
 #
 # Copyright © 2012, 2014 OnlineGroups.net and Contributors.
 # All Rights Reserved.
@@ -11,13 +11,13 @@
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-##############################################################################
+############################################################################
 from __future__ import absolute_import, unicode_literals
 import codecs
 from sqlalchemy import (create_engine, MetaData, Table)
 from zope.cachedescriptors.property import Lazy
-from gs.auth.token.createtoken import (create_token, delete_old_tokens_from_db,
-                                        add_token_to_db)
+from gs.auth.token.createtoken import (
+    create_token, delete_old_tokens_from_db, add_token_to_db)
 UTF8 = 'utf-8'
 
 
@@ -111,7 +111,7 @@ port = {port}'''
             retval = '{0}\nusername = {1}'.format(retval, self.smtp['user'])
         if self.smtp['password']:
             retval = '{0}\npassword = {1}'.format(retval,
-                                                    self.smtp['password'])
+                                                  self.smtp['password'])
         return retval
 
     def create_token(self):
