@@ -18,7 +18,7 @@ from gs.recipe.config.tests.configcreator import (TestCreatorDB,
     TestCreatorSMTP, TestCreatorWebservice)
 from gs.recipe.config.tests.recipe import TestRecipe
 testCases = (TestCreatorDB, TestCreatorSMTP, TestCreatorWebservice,
-                TestRecipe, )
+             TestRecipe, )
 
 
 def load_tests(loader, tests, pattern):

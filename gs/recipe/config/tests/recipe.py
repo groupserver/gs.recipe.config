@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright © 2014 OnlineGroups.net and Contributors.
+# Copyright © 2014, 2015 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -55,22 +55,21 @@ class TestRecipe(TestCase):
         gs.recipe.config.recipe.ConfigCreator.write_token = \
             MagicMock(return_value='fake-token')
 
-        gs.recipe.config.recipe.sys.stdout = MagicMock()
-        gs.recipe.config.recipe.sys.stderr = MagicMock()
-
     def tearDown(self):
         rmtree(self.tempdir)
         self.tempdir = self.bindir = self.destPath = None
 
     def assert_should_run_true(self, recipe):
         msg = 'Recipe should run, but ConfigRecipe.should_run returned False.'
-        r = recipe.should_run()
+        with patch('gs.recipe.config.recipe.sys.stdout'):
+            r = recipe.should_run()
         self.assertTrue(r, msg)
 
     def assert_should_run_false(self, recipe):
         msg = 'Recipe should be locked, but ConfigRecipe.should_run returned '\
                 'True.'
-        r = recipe.should_run()
+        with patch('gs.recipe.config.recipe.sys.stdout'):
+            r = recipe.should_run()
         self.assertFalse(r, msg)
 
     def test_install_standard(self):
@@ -78,7 +77,8 @@ class TestRecipe(TestCase):
         recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout, self.name,
                                                         self.options)
         self.assert_should_run_true(recipe)
-        recipe.install()
+        with patch('gs.recipe.config.recipe.sys.stdout') as m_stdout:
+            recipe.install()
         self.assert_should_run_false(recipe)
 
         self.assertTrue(os.path.exists(self.tempdir))
@@ -103,7 +103,8 @@ class TestRecipe(TestCase):
             recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout,
                                                     self.name, self.options)
             self.assert_should_run_true(recipe)
-            self.assertRaises(UserError, recipe.install)
+            with patch('gs.recipe.config.recipe.sys.stdout') as m_stdout:
+                self.assertRaises(UserError, recipe.install)
             # Should not be locked after the raise
             self.assert_should_run_true(recipe)
 
@@ -116,7 +117,8 @@ class TestRecipe(TestCase):
             recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout,
                                                 self.name, self.options)
             self.assert_should_run_true(recipe)
-            recipe.install()
+            with patch('gs.recipe.config.recipe.sys.stdout') as m_stdout:
+                recipe.install()
             self.assert_should_run_false(recipe)
             self.tearDown()
             self.setUp()
@@ -131,7 +133,8 @@ class TestRecipe(TestCase):
             recipe = gs.recipe.config.recipe.ConfigRecipe(self.buildout,
                                                 self.name, self.options)
             self.assert_should_run_true(recipe)
-            self.assertRaises(UserError, recipe.install)
+            with patch('gs.recipe.config.recipe.sys.stdout') as m_stdout:
+                self.assertRaises(UserError, recipe.install)
             # Should not be locked after the raise
             self.assert_should_run_true(recipe)
 
